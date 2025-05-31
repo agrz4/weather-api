@@ -9,7 +9,7 @@ import (
 
 var ctx = context.Background()
 
-func NewRedisCacheZ(addr, pw string, db int) *redis.Client {
+func NewRedisCache(addr, pw string, db int) *redis.Client {
 	client := redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: pw,

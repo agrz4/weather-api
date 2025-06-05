@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"go-weather-api/service"
 	"net/http"
 	"time"
 
@@ -11,8 +12,9 @@ import (
 )
 
 type application struct {
-	config config
-	logger *zap.SugaredLogger
+	config         config
+	logger         *zap.SugaredLogger
+	weatherService service.WeatherService
 }
 
 type config struct {
@@ -45,8 +47,11 @@ func (app *application) mount() http.Handler {
 		r.Get("/", app.healthCheckHandler)
 	})
 
-	return r
+	r.Route("/v1", func(r chi.Router) {
+		r.Get("/weather", app.weatherHandler)
+	})
 
+	return r
 }
 
 func (app *application) run(mux http.Handler) error {

@@ -26,6 +26,8 @@ func (app *application) healthCheckHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *application) weatherHandler(w http.ResponseWriter, r *http.Request) {
+	// h.logger.Infow("Weather endpoint accessed", "method", r.Method, "url", r.URL.String())
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(h.config.contextTimeout)*time.Second)
 	defer cancel()
 
@@ -35,10 +37,11 @@ func (h *application) weatherHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.logger.Infow("fetching weather data", "city", city)
+	h.logger.Infow("Fetching weather data", "city", city)
 
 	response, err := h.weatherService.GetWeatherByCity(ctx, city)
-
+	// When the Redis key expires, It will be skip err and the data is re-stored in Redis.
+	// This prevents continuous API requests with the previously stored key in Redis.
 	if err == nil {
 		h.logger.Infow("Cached hit", "city", city)
 		w.Header().Set("Content-Type", "application/json")
@@ -48,6 +51,8 @@ func (h *application) weatherHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+
+	// h.logger.Warnw("Cache miss, fetching from API", "city", city)
 
 	apiUrl := &types.Api{
 		Url:    h.config.apiURL,
@@ -62,9 +67,9 @@ func (h *application) weatherHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.logger.Infow("weather data fetched and cached", "city", city)
+	h.logger.Infow("Weather data fetched and cached", "city", city)
 
-	// return the fetched weather data
+	// Return the fetched weather data
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"status": "success",

@@ -16,6 +16,7 @@ import (
 var rdb *redis.Client
 
 func main() {
+
 	cfg := config{
 		addr:   env.GetString("ADDR", ":8080"),
 		apiURL: env.GetString("WEATHER_API_URL", ""),
@@ -27,6 +28,7 @@ func main() {
 		},
 		contextTimeout: env.GetInt("TIME_DURATION", 10),
 	}
+
 	logger := zap.Must(zap.NewProduction()).Sugar()
 	defer logger.Sync()
 
@@ -49,7 +51,8 @@ func main() {
 
 	mux := app.mount()
 	if err := app.run(mux); err != nil {
-		fmt.Println("err connecting")
+		fmt.Println("err connecting ")
 	}
 	log.Println(app.run(mux))
+
 }

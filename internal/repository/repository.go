@@ -25,6 +25,7 @@ func (r *weatherRepository) CreateWeather(ctx context.Context, key string, weath
 	if err != nil {
 		return fmt.Errorf("failed to set weather in cache: %w", err)
 	}
+
 	return nil
 }
 

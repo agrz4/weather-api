@@ -36,7 +36,8 @@ func NewWeatherService(weatherRepository repository.WeatherRepository, timeout t
 func (s *weatherService) CreateWeather(ctx context.Context, url *types.Api) (*types.StoreData, error) {
 	var weather *model.Weather
 
-	apiUrl := fmt.Sprintf("http://%s?key=%s&q=%s", url.Url, url.ApiKey, url.City)
+	baseUrl := strings.TrimPrefix(url.Url, "http://")
+	apiUrl := fmt.Sprintf("http://%s?key=%s&q=%s", baseUrl, url.ApiKey, url.City)
 
 	body, err := utils.ApiCall(apiUrl)
 	if err != nil {

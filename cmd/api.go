@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"go-weather-api/internal/middleware"
 	"go-weather-api/service"
 	"net/http"
 	"time"
@@ -42,6 +43,9 @@ func (app *application) mount() http.Handler {
 		AllowCredentials: false,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
+
+	// Add rate limiter middleware
+	r.Use(middleware.RateLimiter(rdb))
 
 	r.Route("/health", func(r chi.Router) {
 		r.Get("/", app.healthCheckHandler)
